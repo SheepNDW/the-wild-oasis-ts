@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import styled from 'styled-components';
 import { deleteCabin } from '~/services/apiCabins';
 import type { Tables } from '~/types/supabase';
@@ -55,19 +56,19 @@ function CabinRow({ cabin }: CabinRowProps) {
   const { isLoading: isDeleting, mutate } = useMutation({
     mutationFn: deleteCabin,
     onSuccess: () => {
-      alert('Cabin successfully deleted');
+      toast.success('Cabin successfully deleted');
       queryClient.invalidateQueries({
         queryKey: ['cabins'],
       });
     },
-    onError: (error: Error) => alert(error.message),
+    onError: (error: Error) => toast.error(error.message),
   });
 
   return (
     <TableRow role="row">
       <Img src={image || ''} alt={name || ''} />
       <Cabin>{name}</Cabin>
-      <div>Fits up tp {maxCapacity} guests</div>
+      <div>Fits up to {maxCapacity} guests</div>
       <Price>{formatCurrency(regularPrice)}</Price>
       <Discount>{formatCurrency(discount)}</Discount>
       <button onClick={() => mutate(cabinId)} disabled={isDeleting}>
