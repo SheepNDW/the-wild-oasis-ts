@@ -1,7 +1,7 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useForm, type SubmitErrorHandler, type SubmitHandler } from 'react-hook-form';
-import toast from 'react-hot-toast';
-import { createEditCabin, type Cabin, type NewCabin } from '~/services/apiCabins';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { useCreateCabin } from '~/features/cabins/useCreateCabin';
+import { useEditCabin } from '~/features/cabins/useEditCabin';
+import { type Cabin, type NewCabin } from '~/services/apiCabins';
 
 import Button from '~/ui/Button';
 import FileInput from '~/ui/FileInput';
@@ -16,36 +16,13 @@ function CreateCabinForm({ cabinToEdit = {} as Cabin }: { cabinToEdit: Cabin }) 
   const { id: editId, ...editValues } = cabinToEdit;
   const isEditSession = Boolean(editId);
 
-  const queryClient = useQueryClient();
   const { register, handleSubmit, reset, getValues, formState } = useForm<FormValues>({
     defaultValues: isEditSession ? (editValues as FormValues) : {},
   });
   const { errors } = formState;
 
-  const { mutate: createCabin, isLoading: isCreating } = useMutation({
-    mutationFn: createEditCabin,
-    onSuccess: () => {
-      toast.success('New cabin successfully created');
-      queryClient.invalidateQueries(['cabins']);
-      reset();
-    },
-    onError: (error: Error) => {
-      toast.error('An error occurred: ' + error.message);
-    },
-  });
-
-  const { mutate: editCabin, isLoading: isEditing } = useMutation({
-    mutationFn: ({ newCabinData, id }: { newCabinData: NewCabin; id: number }) =>
-      createEditCabin(newCabinData, id),
-    onSuccess: () => {
-      toast.success('Cabin successfully edited');
-      queryClient.invalidateQueries(['cabins']);
-      reset();
-    },
-    onError: (error: Error) => {
-      toast.error('An error occurred: ' + error.message);
-    },
-  });
+  const { isCreating, createCabin } = useCreateCabin();
+  const { isEditing, editCabin } = useEditCabin();
 
   const isWorking = isCreating || isEditing;
 
@@ -53,21 +30,27 @@ function CreateCabinForm({ cabinToEdit = {} as Cabin }: { cabinToEdit: Cabin }) 
     const image = typeof data.image === 'string' ? data.image : data.image[0];
 
     if (isEditSession) {
-      editCabin({
-        newCabinData: { ...data, image },
-        id: editId,
-      });
+      editCabin(
+        {
+          newCabinData: { ...data, image },
+          id: editId,
+        },
+        {
+          onSuccess: () => reset(),
+        }
+      );
     } else {
-      createCabin({ ...data, image: data.image[0] });
+      createCabin(
+        { ...data, image: image },
+        {
+          onSuccess: () => reset(),
+        }
+      );
     }
   };
 
-  const onError: SubmitErrorHandler<FormValues> = (_errors) => {
-    // console.log(errors);
-  };
-
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)}>
+    <Form onSubmit={handleSubmit(onSubmit)}>
       <FormRow label="Cabin name" error={errors?.name?.message}>
         <Input
           type="text"
