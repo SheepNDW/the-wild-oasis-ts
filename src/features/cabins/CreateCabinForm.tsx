@@ -12,7 +12,7 @@ import Textarea from '~/ui/Textarea';
 
 type FormValues = NewCabin & { image: FileList };
 
-function CreateCabinForm({ cabinToEdit = {} as Cabin }: { cabinToEdit: Cabin }) {
+function CreateCabinForm({ cabinToEdit = {} as Cabin }: { cabinToEdit?: Cabin }) {
   const { id: editId, ...editValues } = cabinToEdit;
   const isEditSession = Boolean(editId);
 
