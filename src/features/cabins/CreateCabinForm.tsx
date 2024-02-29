@@ -12,7 +12,13 @@ import Textarea from '~/ui/Textarea';
 
 type FormValues = NewCabin & { image: FileList };
 
-function CreateCabinForm({ cabinToEdit = {} as Cabin }: { cabinToEdit?: Cabin }) {
+function CreateCabinForm({
+  cabinToEdit = {} as Cabin,
+  onCloseModal,
+}: {
+  cabinToEdit?: Cabin;
+  onCloseModal?: () => void;
+}) {
   const { id: editId, ...editValues } = cabinToEdit;
   const isEditSession = Boolean(editId);
 
@@ -36,21 +42,27 @@ function CreateCabinForm({ cabinToEdit = {} as Cabin }: { cabinToEdit?: Cabin })
           id: editId,
         },
         {
-          onSuccess: () => reset(),
+          onSuccess: () => {
+            reset();
+            onCloseModal?.();
+          },
         }
       );
     } else {
       createCabin(
         { ...data, image: image },
         {
-          onSuccess: () => reset(),
+          onSuccess: () => {
+            reset();
+            onCloseModal?.();
+          },
         }
       );
     }
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(onSubmit)} type={onCloseModal ? 'modal' : 'regular'}>
       <FormRow label="Cabin name" error={errors?.name?.message}>
         <Input
           type="text"
@@ -125,7 +137,7 @@ function CreateCabinForm({ cabinToEdit = {} as Cabin }: { cabinToEdit?: Cabin })
 
       <FormRow>
         {/* type is an HTML attribute! */}
-        <Button color="secondary" type="reset">
+        <Button color="secondary" type="reset" onClick={() => onCloseModal?.()}>
           Cancel
         </Button>
         <Button disabled={isWorking}>{isEditSession ? 'Edit cabin' : 'Create new cabin'}</Button>
