@@ -5,6 +5,7 @@ import { useCreateCabin } from '~/features/cabins/useCreateCabin';
 import { useDeleteCabin } from '~/features/cabins/useDeleteCabin';
 import { NewCabin, type Cabin } from '~/services/apiCabins';
 import ConfirmDelete from '~/ui/ConfirmDelete';
+import Menus from '~/ui/Menus';
 import Modal from '~/ui/Modal';
 import Table from '~/ui/Table';
 import { formatCurrency } from '~/utils/helpers';
@@ -94,6 +95,18 @@ function CabinRow({ cabin }: CabinRowProps) {
             />
           </Modal.Window>
         </Modal>
+
+        <Menus.Menu>
+          <Menus.Toggle id={cabinId} />
+
+          <Menus.List id={cabinId}>
+            <Menus.Button icon={<HiSquare2Stack />} onClick={handleDuplicate}>
+              Duplicate
+            </Menus.Button>
+            <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+            <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+          </Menus.List>
+        </Menus.Menu>
       </div>
     </Table.Row>
   );
