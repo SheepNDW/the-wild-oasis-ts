@@ -1,19 +1,11 @@
-import { QueryData } from '@supabase/supabase-js';
+import type { SortField } from '~/features/bookings/BookingTableOperations';
 import supabase from '~/services/supabase';
 import { Tables } from '~/types/supabase';
 import { getToday } from '~/utils/helpers';
 
-const getBookingsQuery = supabase
-  .from('bookings')
-  .select(
-    'id, created_at, startDate, endDate, numNights, numGuests, status, totalPrice, cabins(name), guests(fullName, email)'
-  );
-
-type BookingsQuery = QueryData<typeof getBookingsQuery>;
-type BookingItem = BookingsQuery[0];
 type Status = 'unconfirmed' | 'checked-in' | 'checked-out';
-
-export interface Booking extends BookingItem {
+type QueryMethod = 'gte' | 'lte';
+export interface Booking {
   id: number;
   created_at: string;
   startDate: string;
@@ -27,15 +19,39 @@ export interface Booking extends BookingItem {
 }
 export type Bookings = Booking[];
 
-export async function getBookings() {
-  const { data, error } = await getBookingsQuery.returns<Bookings>();
+export async function getBookings({
+  filter,
+  sortBy,
+}: {
+  filter: { field: string; value: string; method?: QueryMethod } | null;
+  sortBy: { field: SortField; direction: 'asc' | 'desc' };
+}) {
+  let query = supabase
+    .from('bookings')
+    .select(
+      'id, created_at, startDate, endDate, numNights, numGuests, status, totalPrice, cabins(name), guests(fullName, email)'
+    );
+
+  if (filter !== null) {
+    if (filter.method) {
+      query = query[filter.method](filter.field, filter.value);
+    } else {
+      query = query.eq(filter.field, filter.value);
+    }
+  }
+
+  if (sortBy) {
+    query = query.order(sortBy.field, { ascending: sortBy.direction === 'asc' });
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error(error.message);
     throw new Error(error.message);
   }
 
-  return data;
+  return data as Bookings;
 }
 
 export async function getBooking(id: number) {
