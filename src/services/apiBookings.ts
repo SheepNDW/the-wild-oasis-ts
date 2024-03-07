@@ -1,6 +1,7 @@
 import type { SortField } from '~/features/bookings/BookingTableOperations';
 import supabase from '~/services/supabase';
 import { Tables } from '~/types/supabase';
+import { PAGE_SIZE } from '~/utils/constant';
 import { getToday } from '~/utils/helpers';
 
 type Status = 'unconfirmed' | 'checked-in' | 'checked-out';
@@ -22,14 +23,17 @@ export type Bookings = Booking[];
 export async function getBookings({
   filter,
   sortBy,
+  page,
 }: {
   filter: { field: string; value: string; method?: QueryMethod } | null;
   sortBy: { field: SortField; direction: 'asc' | 'desc' };
+  page: number;
 }) {
   let query = supabase
     .from('bookings')
     .select(
-      'id, created_at, startDate, endDate, numNights, numGuests, status, totalPrice, cabins(name), guests(fullName, email)'
+      'id, created_at, startDate, endDate, numNights, numGuests, status, totalPrice, cabins(name), guests(fullName, email)',
+      { count: 'exact' }
     );
 
   if (filter !== null) {
@@ -44,14 +48,23 @@ export async function getBookings({
     query = query.order(sortBy.field, { ascending: sortBy.direction === 'asc' });
   }
 
-  const { data, error } = await query;
+  if (page) {
+    const from = PAGE_SIZE * (page - 1);
+    const to = from + PAGE_SIZE - 1;
+    query = query.range(from, to);
+  }
+
+  const { data, error, count } = await query.returns<Bookings>();
 
   if (error) {
     console.error(error.message);
     throw new Error(error.message);
   }
 
-  return data as Bookings;
+  return {
+    data,
+    count,
+  };
 }
 
 export async function getBooking(id: number) {
