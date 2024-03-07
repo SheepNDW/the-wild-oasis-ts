@@ -3,6 +3,7 @@ import supabase from '~/services/supabase';
 import { Tables } from '~/types/supabase';
 import { PAGE_SIZE } from '~/utils/constant';
 import { getToday } from '~/utils/helpers';
+import { Cabin } from './apiCabins';
 
 type Status = 'unconfirmed' | 'checked-in' | 'checked-out';
 type QueryMethod = 'gte' | 'lte';
@@ -67,6 +68,37 @@ export async function getBookings({
   };
 }
 
+export interface BookingDetail {
+  id: number;
+  created_at: string;
+  startDate: string;
+  endDate: string;
+  numNights: number;
+  numGuests: number;
+  cabinPrice: number;
+  extrasPrice: number;
+  totalPrice: number;
+  status: Status;
+  hasBreakfast: boolean;
+  isPaid: boolean;
+  observations: string | null;
+  cabinId: number;
+  guestId: number;
+  cabins: Cabin;
+  guests: Guest;
+}
+
+interface Guest {
+  id: number;
+  email: string;
+  fullName: string;
+  created_at: string;
+  nationalID: string;
+  countryFlag: string | null;
+  nationality: string;
+  country: string;
+}
+
 export async function getBooking(id: number) {
   const { data, error } = await supabase
     .from('bookings')
@@ -79,7 +111,7 @@ export async function getBooking(id: number) {
     throw new Error('Booking not found');
   }
 
-  return data;
+  return data as BookingDetail;
 }
 
 // Returns all BOOKINGS that are were created after the given date. Useful to get bookings created in the last 30 days, for example.
