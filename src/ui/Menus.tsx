@@ -62,6 +62,10 @@ const StyledButton = styled.button`
     background-color: var(--color-grey-50);
   }
 
+  & span {
+    white-space: nowrap;
+  }
+
   & svg {
     width: 1.6rem;
     height: 1.6rem;
