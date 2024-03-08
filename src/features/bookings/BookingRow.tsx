@@ -1,5 +1,5 @@
 import { format, isToday } from 'date-fns';
-import { HiEye } from 'react-icons/hi2';
+import { HiArrowDownOnSquare, HiArrowUpOnSquare, HiEye } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -91,6 +91,19 @@ function BookingRow({
           <Menus.Button icon={<HiEye />} onClick={() => navigate(`/bookings/${bookingId}`)}>
             See details
           </Menus.Button>
+
+          {status === 'unconfirmed' && (
+            <Menus.Button
+              icon={<HiArrowDownOnSquare />}
+              onClick={() => navigate(`/checkin/${bookingId}`)}
+            >
+              Check in
+            </Menus.Button>
+          )}
+
+          {status === 'checked-in' && (
+            <Menus.Button icon={<HiArrowUpOnSquare />}>Check out</Menus.Button>
+          )}
         </Menus.List>
       </Menus.Menu>
     </Table.Row>
