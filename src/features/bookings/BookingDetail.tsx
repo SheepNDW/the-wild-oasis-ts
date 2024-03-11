@@ -11,6 +11,7 @@ import Tag from '~/ui/Tag';
 
 import BookingDataBox from '~/features/bookings/BookingDataBox';
 import { useBooking } from '~/features/bookings/useBooking';
+import { useCheckout } from '~/features/check-in-out/useCheckout';
 import { useMoveBack } from '~/hooks/useMoveBack';
 
 const HeadingGroup = styled.div`
@@ -23,6 +24,8 @@ function BookingDetail() {
   const { booking, isLoading } = useBooking();
   const moveBack = useMoveBack();
   const navigate = useNavigate();
+
+  const { checkout, isCheckingOut } = useCheckout();
 
   if (isLoading) return <Spinner />;
 
@@ -49,6 +52,12 @@ function BookingDetail() {
       <ButtonGroup>
         {status === 'unconfirmed' && (
           <Button onClick={() => navigate(`/checkin/${bookingId}`)}>Check in</Button>
+        )}
+
+        {status === 'checked-in' && (
+          <Button onClick={() => checkout(bookingId)} disabled={isCheckingOut}>
+            Check out
+          </Button>
         )}
 
         <Button color="secondary" onClick={moveBack}>

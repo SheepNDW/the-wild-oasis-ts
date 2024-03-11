@@ -7,6 +7,7 @@ import Menus from '~/ui/Menus';
 import Table from '~/ui/Table';
 import Tag from '~/ui/Tag';
 
+import { useCheckout } from '~/features/check-in-out/useCheckout';
 import { type Booking } from '~/services/apiBookings';
 import { formatCurrency, formatDistanceFromNow } from '~/utils/helpers';
 
@@ -54,6 +55,7 @@ function BookingRow({
   booking: Booking;
 }) {
   const navigate = useNavigate();
+  const { checkout } = useCheckout();
 
   const statusToTagName = {
     unconfirmed: 'blue',
@@ -102,7 +104,9 @@ function BookingRow({
           )}
 
           {status === 'checked-in' && (
-            <Menus.Button icon={<HiArrowUpOnSquare />}>Check out</Menus.Button>
+            <Menus.Button icon={<HiArrowUpOnSquare />} onClick={() => checkout(bookingId)}>
+              Check out
+            </Menus.Button>
           )}
         </Menus.List>
       </Menus.Menu>
