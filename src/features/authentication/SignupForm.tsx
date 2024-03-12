@@ -3,6 +3,7 @@ import Button from '~/ui/Button';
 import Form from '~/ui/Form';
 import FormRow from '~/ui/FormRow';
 import Input from '~/ui/Input';
+import { useSignup } from '~/features/authentication/useSignup';
 
 type FormValues = {
   fullName: string;
@@ -12,11 +13,13 @@ type FormValues = {
 };
 
 function SignupForm() {
-  const { register, formState, handleSubmit } = useForm<FormValues>();
+  const { register, formState, handleSubmit, reset } = useForm<FormValues>();
   const { errors } = formState;
+  const { signup, isLoading } = useSignup();
 
   function onSubmit(data: FormValues) {
-    console.log(data);
+    const { fullName, email, password } = data;
+    signup({ fullName, email, password }, { onSettled: () => reset() });
   }
 
   return (
@@ -28,6 +31,7 @@ function SignupForm() {
           {...register('fullName', {
             required: 'This field is required',
           })}
+          disabled={isLoading}
         />
       </FormRow>
 
@@ -42,6 +46,7 @@ function SignupForm() {
               message: 'Please enter a valid email address',
             },
           })}
+          disabled={isLoading}
         />
       </FormRow>
 
@@ -53,6 +58,7 @@ function SignupForm() {
             required: 'This field is required',
             minLength: { value: 8, message: 'Password should be at least 8 characters' },
           })}
+          disabled={isLoading}
         />
       </FormRow>
 
@@ -65,6 +71,7 @@ function SignupForm() {
             validate: (value, formValues) =>
               value === formValues.password || 'The passwords need to match',
           })}
+          disabled={isLoading}
         />
       </FormRow>
 
@@ -73,7 +80,7 @@ function SignupForm() {
         <Button color="secondary" type="reset">
           Cancel
         </Button>
-        <Button>Create new user</Button>
+        <Button disabled={isLoading}>Create new user</Button>
       </FormRow>
     </Form>
   );
