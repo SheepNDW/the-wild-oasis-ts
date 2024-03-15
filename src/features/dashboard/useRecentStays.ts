@@ -14,13 +14,13 @@ export function useRecentStays() {
     queryFn: () => getStaysAfterDate(queryDate),
   });
 
-  const confirmedStays = stays?.filter(
-    (stay) => stay.status === 'check-in' || stay.status === 'check-out'
-  );
+  const confirmedStays =
+    stays?.filter((stay) => stay.status === 'checked-in' || stay.status === 'checked-out') ?? [];
 
   return {
     isLoading,
     stays,
     confirmedStays,
+    numDays,
   };
 }
