@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { useCabins } from '~/features/cabins/useCabins';
+import DurationChart from '~/features/dashboard/DurationChart';
 import SalesChart from '~/features/dashboard/SalesChart';
 import Stats from '~/features/dashboard/Stats';
 import { useRecentBookings } from '~/features/dashboard/useRecentBookings';
@@ -29,6 +30,7 @@ function DashboardLayout() {
         cabinCount={cabins?.length || 0}
       />
       <div>Today's activity</div>
+      <DurationChart confirmedStays={confirmedStays} />
       <SalesChart bookings={bookings} numDays={numDays} />
     </StyledDashboardLayout>
   );
