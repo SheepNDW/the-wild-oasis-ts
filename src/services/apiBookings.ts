@@ -172,6 +172,28 @@ export async function getStaysAfterDate(date: string) {
   return data as StaysAfterDate[];
 }
 
+export interface StaysTodayActivity {
+  id: number;
+  startDate: string;
+  endDate: string;
+  numNights: number;
+  numGuests: number;
+  cabinPrice: number;
+  extrasPrice: number;
+  totalPrice: number;
+  status: Status;
+  hasBreakfast: boolean;
+  isPaid: boolean;
+  observations: string | null;
+  cabinId: number;
+  guestId: number;
+  guests: {
+    fullName: string;
+    countryFlag: string;
+    nationality: string;
+  };
+}
+
 // Activity means that there is a check in or a check out today
 export async function getStaysTodayActivity() {
   const { data, error } = await supabase
@@ -190,7 +212,7 @@ export async function getStaysTodayActivity() {
     console.error(error);
     throw new Error('Bookings could not get loaded');
   }
-  return data;
+  return data as StaysTodayActivity[];
 }
 
 export type NewBooking = Omit<Tables<'bookings'>, 'id'>;
