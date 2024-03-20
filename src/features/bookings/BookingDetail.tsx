@@ -16,6 +16,7 @@ import { useBooking } from '~/features/bookings/useBooking';
 import { useDeleteBooking } from '~/features/bookings/useDeleteBooking';
 import { useCheckout } from '~/features/check-in-out/useCheckout';
 import { useMoveBack } from '~/hooks/useMoveBack';
+import Empty from '~/ui/Empty';
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -33,6 +34,7 @@ function BookingDetail() {
   const { deleteBooking, isDeleteingBooking } = useDeleteBooking();
 
   if (isLoading) return <Spinner />;
+  if (!booking) return <Empty resourceName="booking" />;
 
   const { status, id: bookingId } = booking;
 
